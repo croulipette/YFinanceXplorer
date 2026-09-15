@@ -1,0 +1,13 @@
+# Python backend
+backend/.venv/
+backend/**/__pycache__/
+*.pyc
+backend/uvicorn.log
+backend/certs/*.pem
+
+# Node frontend
+frontend/node_modules/
+frontend/dist/
+
+# OS / editor
+.DS_Store

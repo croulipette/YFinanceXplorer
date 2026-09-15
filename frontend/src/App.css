@@ -1,0 +1,232 @@
+.app {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.app-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+}
+
+.app-header p {
+  margin: 0 0 24px;
+  color: var(--text-muted);
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.route-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.route-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.route-card-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.endpoint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+button {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.route-card-body {
+  margin-top: 16px;
+}
+
+.error {
+  color: var(--danger);
+  margin-top: 12px;
+}
+
+.note {
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 12px;
+}
+
+.raw-json {
+  margin-top: 16px;
+}
+
+.raw-json summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.raw-json pre {
+  background: var(--track);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  max-height: 280px;
+}
+
+.kv-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin-top: 8px;
+}
+
+.kv-grid span {
+  color: var(--text-muted);
+}
+
+.resolve-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.resolve-form input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.profile-name {
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.weightings {
+  margin-top: 16px;
+}
+
+.weightings-title {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+
+.weightings ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weightings li {
+  display: grid;
+  grid-template-columns: 140px 1fr 50px;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.weighting-label {
+  text-transform: capitalize;
+  color: var(--text-muted);
+}
+
+.weighting-bar-track {
+  background: var(--track);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.weighting-bar-fill {
+  background: var(--accent);
+  height: 100%;
+}
+
+.weighting-value {
+  text-align: right;
+}
+
+.price-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.price-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.price-change.up {
+  color: var(--success);
+}
+
+.price-change.down {
+  color: var(--danger);
+}
+
+.history-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.history-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.history-controls select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.history-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.chart-wrapper {
+  margin-top: 8px;
+}

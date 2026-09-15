@@ -1,0 +1,79 @@
+# YFinance Explorer
+
+Petite app pour resoudre un code ISIN via Yahoo Finance (yfinance) et explorer,
+route par route, les donnees associees : secteur/zone geographique, valeur
+courante, historique (graphique) et frais de gestion.
+
+## Architecture
+
+```
+backend/   FastAPI + yfinance -> une route par fonctionnalite, donnees formatees en JSON
+frontend/  React + Vite -> un bouton "Tester la route" par carte/fonctionnalite
+```
+
+Le frontend n'appelle jamais yfinance directement : chaque carte de l'UI
+correspond a exactement une route backend.
+
+| Fonctionnalite demandee        | Route backend                                  | Source yfinance |
+|---------------------------------|-------------------------------------------------|-----------------|
+| ISIN -> symbole Yahoo           | `GET /api/securities/resolve?isin=...`           | `yf.Search(isin)` (Yahoo detecte automatiquement le format ISIN) |
+| Secteur d'activite              | `GET /api/securities/{symbol}/profile`           | `Ticker.info["sector"/"industry"]` (actions) ou `Ticker.funds_data.sector_weightings` (ETF/fonds) |
+| Secteur/zone geographique       | `GET /api/securities/{symbol}/profile`           | `Ticker.info["country"]`, converti en zone (Europe, Amerique du Nord...) via une table de correspondance interne |
+| Valeur courante                 | `GET /api/securities/{symbol}/price`             | `Ticker.fast_info` (last_price, previous_close, currency) |
+| Historique (courbe)             | `GET /api/securities/{symbol}/history`           | `Ticker.history(period=, interval=)` |
+| Frais de gestion (optionnel)    | `GET /api/securities/{symbol}/fees`              | `Ticker.funds_data.fund_operations` ("Annual Report Expense Ratio"), uniquement pour ETF/fonds |
+
+Chaque route degrade proprement (renvoie `note` explicative) quand Yahoo Finance
+ne fournit pas la donnee (ex : pas de secteur pour un fonds, pas de frais pour
+une action).
+
+## Lancer le backend
+
+```powershell
+cd backend
+python -m venv .venv          # premiere fois seulement
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt   # premiere fois seulement
+.\scripts\build-ca-bundle.ps1     # genere backend/certs/combined-ca-bundle.pem (non versionne)
+$env:SSL_CERT_FILE = "$PWD\certs\combined-ca-bundle.pem"
+$env:REQUESTS_CA_BUNDLE = "$PWD\certs\combined-ca-bundle.pem"
+$env:CURL_CA_BUNDLE = "$PWD\certs\combined-ca-bundle.pem"
+python -m uvicorn app.main:app --port 8000 --reload
+```
+
+Documentation interactive (Swagger) : http://127.0.0.1:8000/docs
+
+### Pourquoi le bundle de certificats ?
+
+Le reseau de l'entreprise inspecte le trafic HTTPS (proxy Cato Networks /
+CA interne `LDC-DC03-CA`). yfinance (via `curl_cffi`) a besoin d'un certificat
+crumb/cookie aupres de `fc.yahoo.com` pour les appels `Ticker.info` et
+`funds_data` ; sans ce bundle, ces deux endpoints echouent silencieusement
+(les autres, comme `fast_info`/`history`, fonctionnent sans).
+
+`backend/certs/*.pem` n'est **pas** versionne (contient la CA interne de
+l'entreprise) : `scripts/build-ca-bundle.ps1` le regenere localement en
+combinant les CA publics (certifi) et la CA interne trouvee dans le magasin
+Windows. A relancer apres un `git clone` ou une recreation du venv. Sur un
+poste sans inspection TLS, les 3 variables d'environnement peuvent simplement
+etre omises.
+
+## Lancer le frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Ouvre l'URL affichee (http://localhost:5173 par defaut). Le serveur de dev
+Vite proxifie automatiquement `/api/*` vers `http://127.0.0.1:8000`.
+
+## Limites connues
+
+- La "zone geographique" est deduite du pays du siege social (`info.country`)
+  via une table de correspondance simple ; ce n'est pas une repartition des
+  revenus par zone (donnee non exposee par yfinance pour les actions).
+- Les frais de gestion (`fund_operations`) ne sont pas toujours fournis par
+  Yahoo Finance pour tous les ETF (limitation cote donnees, pas cote code) ;
+  la route renvoie alors une note explicative plutot qu'une erreur.
