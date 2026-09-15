@@ -39,3 +39,7 @@ export function getHistory(symbol, period = '1y', interval = '1d') {
 export function getFees(symbol) {
   return request(`${BASE_URL}/${encodeURIComponent(symbol)}/fees`)
 }
+
+export function getCountryBreakdown(isin) {
+  return request(`/api/geography/countries?isin=${encodeURIComponent(isin)}`)
+}

@@ -130,6 +130,20 @@ button:disabled {
   margin: 0 0 8px;
 }
 
+.source-badge {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: var(--track);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin: 0 0 12px;
+  display: inline-block;
+}
+
+.source-badge a {
+  color: var(--accent);
+}
+
 .weightings {
   margin-top: 16px;
 }

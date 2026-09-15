@@ -22,10 +22,33 @@ correspond a exactement une route backend.
 | Valeur courante                 | `GET /api/securities/{symbol}/price`             | `Ticker.fast_info` (last_price, previous_close, currency) |
 | Historique (courbe)             | `GET /api/securities/{symbol}/history`           | `Ticker.history(period=, interval=)` |
 | Frais de gestion (optionnel)    | `GET /api/securities/{symbol}/fees`              | `Ticker.funds_data.fund_operations` ("Annual Report Expense Ratio"), uniquement pour ETF/fonds |
+| Repartition geographique par pays (ETF/fonds) | `GET /api/geography/countries?isin=...` | Scraping de justETF.com (hors yfinance, voir ci-dessous) |
 
-Chaque route degrade proprement (renvoie `note` explicative) quand Yahoo Finance
+Chaque route degrade proprement (renvoie `note` explicative) quand la source
 ne fournit pas la donnee (ex : pas de secteur pour un fonds, pas de frais pour
 une action).
+
+### Repartition geographique (justETF)
+
+yfinance/Yahoo Finance n'expose aucune ventilation par pays pour les ETF/fonds
+(seulement secteurs et classes d'actifs, voir plus haut). `GET
+/api/geography/countries?isin=...` va donc chercher cette donnee sur
+justETF.com, qui n'a pas d'API publique documentee : la page profil
+(`/en/etf-profile.html?isin=...`) affiche par defaut le top ~4 pays + "Other",
+et un lien "Show more" declenche un appel AJAX (framework Apache Wicket) qui
+renvoie la liste complete en HTML structure (attributs `data-testid` stables).
+`backend/app/services/justetf_service.py` reproduit ces deux requetes HTTP
+(pas de navigateur headless, pas de JS execute) et parse le HTML avec
+BeautifulSoup. Verifie conforme a `robots.txt` (seuls `/servlet/`, `/link/` et
+les recherches/watchlist avec `_wicket` sont interdits).
+
+Points d'attention :
+- **Source non officielle** : ce n'est pas un contrat d'API, ca peut casser si
+  justETF change son balisage. L'UI affiche toujours explicitement `source:
+  "justETF"` + l'URL exacte consultee, pour qu'on sache d'ou vient la donnee.
+- Un cache en memoire (6h) evite de solliciter justETF a chaque clic.
+- Si l'ISIN ne correspond a aucun ETF sur justETF (ex : une action), la route
+  renvoie `countries: null` avec une `note` explicative plutot qu'une erreur.
 
 ## Demarrage rapide
 

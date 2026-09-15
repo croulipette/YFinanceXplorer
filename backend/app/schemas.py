@@ -52,6 +52,14 @@ class HistoryResponse(BaseModel):
     points: List[HistoryPoint]
 
 
+class GeographyResponse(BaseModel):
+    isin: str
+    source: str
+    source_url: str
+    countries: Optional[Dict[str, float]] = None
+    note: Optional[str] = None
+
+
 class FeesResponse(BaseModel):
     symbol: str
     quote_type: Optional[str] = None
