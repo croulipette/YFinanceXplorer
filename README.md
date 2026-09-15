@@ -27,7 +27,20 @@ Chaque route degrade proprement (renvoie `note` explicative) quand Yahoo Finance
 ne fournit pas la donnee (ex : pas de secteur pour un fonds, pas de frais pour
 une action).
 
-## Lancer le backend
+## Demarrage rapide
+
+```powershell
+.\start-all.ps1
+```
+
+(ou double-clic sur `start-all.bat`) : ouvre le backend et le frontend chacun
+dans sa propre fenetre PowerShell, en creant le venv / les node_modules / le
+bundle de certificats au premier lancement si necessaire.
+
+- Backend seul : `backend\start-backend.ps1` (ou `start-backend.bat`)
+- Frontend seul : `frontend\start-frontend.ps1` (ou `start-frontend.bat`)
+
+## Lancer le backend manuellement
 
 ```powershell
 cd backend
@@ -58,7 +71,7 @@ Windows. A relancer apres un `git clone` ou une recreation du venv. Sur un
 poste sans inspection TLS, les 3 variables d'environnement peuvent simplement
 etre omises.
 
-## Lancer le frontend
+## Lancer le frontend manuellement
 
 ```bash
 cd frontend
