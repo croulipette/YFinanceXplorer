@@ -10,6 +10,8 @@ export default function ResolveSection({ onResolved }) {
   const [resolved, setResolved] = useState(null)
   const [candidates, setCandidates] = useState([])
   const [pickingSymbol, setPickingSymbol] = useState(null)
+  const [isinOverride, setIsinOverride] = useState('')
+  const [isinOverrideError, setIsinOverrideError] = useState(null)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -66,6 +68,21 @@ export default function ResolveSection({ onResolved }) {
     setStatus('resolved')
     setCandidates([])
     setPickingSymbol(null)
+    setIsinOverride('')
+    setIsinOverrideError(null)
+    onResolved(data)
+  }
+
+  function handleIsinOverrideSubmit(e) {
+    e.preventDefault()
+    const value = isinOverride.trim().toUpperCase()
+    if (!ISIN_PATTERN.test(value)) {
+      setIsinOverrideError('Format ISIN invalide (12 caracteres).')
+      return
+    }
+    const data = { ...resolved, isin: value }
+    setResolved(data)
+    setIsinOverrideError(null)
     onResolved(data)
   }
 
@@ -131,6 +148,27 @@ export default function ResolveSection({ onResolved }) {
               <strong>{resolved.isin}</strong>
             </>
           )}
+        </div>
+      )}
+
+      {status === 'resolved' && resolved && !resolved.isin && (
+        <div className="isin-override">
+          <p className="note">
+            ISIN non trouve automatiquement (recherche par nom, resolution best-effort
+            indisponible pour ce titre) — necessaire pour la carte "Zone geographique"
+            (justETF). Tu peux le renseigner toi-meme si tu le connais.
+          </p>
+          <form onSubmit={handleIsinOverrideSubmit} className="resolve-form">
+            <input
+              type="text"
+              placeholder="Completer l'ISIN, ex: IE00B4L5Y983"
+              value={isinOverride}
+              onChange={(e) => setIsinOverride(e.target.value)}
+              maxLength={12}
+            />
+            <button type="submit">Valider</button>
+          </form>
+          {isinOverrideError && <p className="error">{isinOverrideError}</p>}
         </div>
       )}
     </section>
