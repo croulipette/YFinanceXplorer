@@ -6,8 +6,6 @@ from typing import Optional
 
 import yfinance as yf
 
-from .geo import country_to_region
-
 ISIN_PATTERN = re.compile(r"^[A-Z]{2}[A-Z0-9]{9}[0-9]$")
 
 FUND_QUOTE_TYPES = {"ETF", "MUTUALFUND"}
@@ -99,7 +97,10 @@ def get_isin_for_symbol(symbol: str) -> Optional[str]:
     return isin
 
 
-def get_profile(symbol: str) -> dict:
+def get_sector(symbol: str) -> dict:
+    """Secteur d'activite uniquement (yfinance). La zone geographique est
+    une fonctionnalite distincte, servie par justETF (voir justetf_service),
+    volontairement pas melangee ici."""
     ticker = yf.Ticker(symbol)
     info = ticker.info or {}
     quote_type = (info.get("quoteType") or "").upper()
@@ -110,8 +111,6 @@ def get_profile(symbol: str) -> dict:
         "name": info.get("longName") or info.get("shortName"),
         "sector": info.get("sector"),
         "industry": info.get("industry"),
-        "country": info.get("country"),
-        "region": country_to_region(info.get("country")),
         "sector_weightings": None,
         "asset_classes": None,
         "long_business_summary": info.get("longBusinessSummary"),

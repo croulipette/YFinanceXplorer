@@ -1,16 +1,16 @@
 import RouteCard from './RouteCard'
-import { getProfile } from '../api'
+import { getSector } from '../api'
 
 function formatPercent(value) {
   return `${(value * 100).toFixed(1)}%`
 }
 
-export default function ProfileSection({ symbol }) {
+export default function SectorSection({ symbol }) {
   return (
     <RouteCard
-      title="Secteur d'activite & zone geographique"
-      endpointLabel={`GET /api/securities/${symbol}/profile`}
-      fetcher={() => getProfile(symbol)}
+      title="Secteur d'activite"
+      endpointLabel={`GET /api/securities/${symbol}/sector`}
+      fetcher={() => getSector(symbol)}
     >
       {(data) => (
         <div className="profile-content">
@@ -22,15 +22,6 @@ export default function ProfileSection({ symbol }) {
               <strong>{data.sector || '-'}</strong>
               <span>Industrie</span>
               <strong>{data.industry || '-'}</strong>
-            </div>
-          )}
-
-          {(data.country || data.region) && (
-            <div className="kv-grid">
-              <span>Pays</span>
-              <strong>{data.country || '-'}</strong>
-              <span>Zone geographique</span>
-              <strong>{data.region || '-'}</strong>
             </div>
           )}
 

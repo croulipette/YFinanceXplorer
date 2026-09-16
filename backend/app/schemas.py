@@ -28,14 +28,12 @@ class IsinLookupResponse(BaseModel):
     isin: Optional[str] = None
 
 
-class ProfileResponse(BaseModel):
+class SectorResponse(BaseModel):
     symbol: str
     quote_type: Optional[str] = None
     name: Optional[str] = None
     sector: Optional[str] = None
     industry: Optional[str] = None
-    country: Optional[str] = None
-    region: Optional[str] = None
     sector_weightings: Optional[Dict[str, float]] = None
     asset_classes: Optional[Dict[str, float]] = None
     long_business_summary: Optional[str] = None

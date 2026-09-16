@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import ResolveSection from './components/ResolveSection'
-import ProfileSection from './components/ProfileSection'
+import SectorSection from './components/SectorSection'
 import GeographySection from './components/GeographySection'
 import PriceSection from './components/PriceSection'
 import HistorySection from './components/HistorySection'
@@ -22,9 +22,8 @@ function App() {
 
         {resolved && (
           <div key={resolved.symbol} className="app-main">
-            <ProfileSection symbol={resolved.symbol} />
-            {(resolved.quote_type === 'ETF' || resolved.quote_type === 'MUTUALFUND') &&
-              resolved.isin && <GeographySection isin={resolved.isin} />}
+            <SectorSection symbol={resolved.symbol} />
+            {resolved.isin && <GeographySection isin={resolved.isin} />}
             <PriceSection symbol={resolved.symbol} />
             <HistorySection symbol={resolved.symbol} />
             <FeesSection symbol={resolved.symbol} />

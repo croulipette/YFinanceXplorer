@@ -92,7 +92,10 @@ def _fetch_country_breakdown(isin: str) -> dict:
             "source": "justETF",
             "source_url": source_url,
             "countries": None,
-            "note": "Aucune repartition par pays publiee par justETF pour ce fonds.",
+            "note": (
+                "Aucune repartition par pays publiee par justETF pour cet ISIN "
+                "(couverture limitee aux ETF/fonds)."
+            ),
         }
 
     countries = _parse_country_table(str(countries_table))

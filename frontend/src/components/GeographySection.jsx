@@ -8,7 +8,7 @@ function formatPercent(value) {
 export default function GeographySection({ isin }) {
   return (
     <RouteCard
-      title="Repartition geographique par pays"
+      title="Zone geographique"
       endpointLabel={`GET /api/geography/countries?isin=${isin}`}
       fetcher={() => getCountryBreakdown(isin)}
     >

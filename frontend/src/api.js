@@ -30,8 +30,8 @@ export function getIsinForSymbol(symbol) {
   return request(`${BASE_URL}/${encodeURIComponent(symbol)}/isin`)
 }
 
-export function getProfile(symbol) {
-  return request(`${BASE_URL}/${encodeURIComponent(symbol)}/profile`)
+export function getSector(symbol) {
+  return request(`${BASE_URL}/${encodeURIComponent(symbol)}/sector`)
 }
 
 export function getPrice(symbol) {

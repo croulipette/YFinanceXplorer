@@ -60,15 +60,15 @@ def isin_for_symbol(symbol: str):
 
 
 @router.get(
-    "/{symbol}/profile",
-    response_model=schemas.ProfileResponse,
-    summary="Secteur d'activite et zone geographique",
+    "/{symbol}/sector",
+    response_model=schemas.SectorResponse,
+    summary="Secteur d'activite (hors zone geographique, voir /api/geography)",
 )
-def profile(symbol: str):
+def sector(symbol: str):
     try:
-        return yf_service.get_profile(symbol)
+        return yf_service.get_sector(symbol)
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Erreur lors de la recuperation du profil : {exc}")
+        raise HTTPException(status_code=502, detail=f"Erreur lors de la recuperation du secteur : {exc}")
 
 
 @router.get(
