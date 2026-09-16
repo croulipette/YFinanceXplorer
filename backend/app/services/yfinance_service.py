@@ -189,6 +189,45 @@ def get_history(symbol: str, period: str = "1y", interval: str = "1d") -> dict:
     }
 
 
+def get_top_holdings(symbol: str, limit: int = 10) -> dict:
+    ticker = yf.Ticker(symbol)
+    info = ticker.info or {}
+    quote_type = (info.get("quoteType") or "").upper()
+
+    result = {
+        "symbol": symbol,
+        "quote_type": quote_type or None,
+        "applicable": quote_type in FUND_QUOTE_TYPES,
+        "holdings": None,
+        "note": None,
+    }
+
+    if not result["applicable"]:
+        result["note"] = "Top holdings non applicable : ce titre n'est pas un ETF ou un fonds."
+        return result
+
+    try:
+        df = ticker.funds_data.top_holdings
+        if df is None or df.empty:
+            result["note"] = "Top holdings non fournis par Yahoo Finance pour ce fonds."
+            return result
+
+        holdings = []
+        for holding_symbol, row in df.head(limit).iterrows():
+            holdings.append(
+                {
+                    "symbol": holding_symbol,
+                    "name": row.get("Name"),
+                    "weight": _safe_float(row.get("Holding Percent")),
+                }
+            )
+        result["holdings"] = holdings
+    except Exception:
+        result["note"] = "Top holdings indisponibles (donnee non fournie par Yahoo Finance)."
+
+    return result
+
+
 def get_fees(symbol: str) -> dict:
     ticker = yf.Ticker(symbol)
     info = ticker.info or {}

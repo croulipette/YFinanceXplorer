@@ -204,6 +204,42 @@ button:disabled {
   margin-top: 16px;
 }
 
+.holdings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  counter-reset: holding;
+}
+
+.holdings-list li {
+  display: grid;
+  grid-template-columns: 24px 70px 1fr 120px 50px;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.holdings-list li::before {
+  counter-increment: holding;
+  content: counter(holding);
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.holding-symbol {
+  font-weight: 600;
+}
+
+.holding-name {
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .weightings-title {
   color: var(--text-muted);
   font-size: 0.85rem;

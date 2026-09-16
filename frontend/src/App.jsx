@@ -3,6 +3,7 @@ import './App.css'
 import ResolveSection from './components/ResolveSection'
 import SectorSection from './components/SectorSection'
 import GeographySection from './components/GeographySection'
+import TopHoldingsSection from './components/TopHoldingsSection'
 import PriceSection from './components/PriceSection'
 import HistorySection from './components/HistorySection'
 import FeesSection from './components/FeesSection'
@@ -24,6 +25,7 @@ function App() {
           <div key={resolved.symbol} className="app-main">
             <SectorSection symbol={resolved.symbol} />
             {resolved.isin && <GeographySection isin={resolved.isin} />}
+            <TopHoldingsSection symbol={resolved.symbol} />
             <PriceSection symbol={resolved.symbol} />
             <HistorySection symbol={resolved.symbol} />
             <FeesSection symbol={resolved.symbol} />

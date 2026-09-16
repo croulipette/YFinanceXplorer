@@ -100,6 +100,18 @@ def history(
 
 
 @router.get(
+    "/{symbol}/top-holdings",
+    response_model=schemas.TopHoldingsResponse,
+    summary="Top 10 positions du fonds (ETF / fonds uniquement)",
+)
+def top_holdings(symbol: str):
+    try:
+        return yf_service.get_top_holdings(symbol)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Erreur lors de la recuperation du top holdings : {exc}")
+
+
+@router.get(
     "/{symbol}/fees",
     response_model=schemas.FeesResponse,
     summary="Frais de gestion (ETF / fonds uniquement)",

@@ -75,6 +75,20 @@ class GeographyResponse(BaseModel):
     note: Optional[str] = None
 
 
+class HoldingItem(BaseModel):
+    symbol: str
+    name: Optional[str] = None
+    weight: Optional[float] = None
+
+
+class TopHoldingsResponse(BaseModel):
+    symbol: str
+    quote_type: Optional[str] = None
+    applicable: bool
+    holdings: Optional[List[HoldingItem]] = None
+    note: Optional[str] = None
+
+
 class FeesResponse(BaseModel):
     symbol: str
     quote_type: Optional[str] = None

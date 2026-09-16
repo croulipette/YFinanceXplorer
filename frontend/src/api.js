@@ -44,6 +44,10 @@ export function getHistory(symbol, period = '1y', interval = '1d') {
   )
 }
 
+export function getTopHoldings(symbol) {
+  return request(`${BASE_URL}/${encodeURIComponent(symbol)}/top-holdings`)
+}
+
 export function getFees(symbol) {
   return request(`${BASE_URL}/${encodeURIComponent(symbol)}/fees`)
 }
