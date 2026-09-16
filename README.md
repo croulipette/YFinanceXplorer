@@ -1,32 +1,64 @@
 # YFinance Explorer
 
-Petite app pour resoudre un code ISIN via Yahoo Finance (yfinance) et explorer,
-route par route, les donnees associees : secteur/zone geographique, valeur
-courante, historique (graphique) et frais de gestion.
+Petite app pour explorer les donnees Yahoo Finance (yfinance) et justETF a
+partir d'un ISIN ou d'un nom : secteur, zone geographique, valeur courante,
+historique, frais de gestion, top holdings — a l'unite ou par lot (portefeuille
+CSV).
 
 ## Architecture
 
 ```
-backend/   FastAPI + yfinance -> une route par fonctionnalite, donnees formatees en JSON
-frontend/  React + Vite -> un bouton "Tester la route" par carte/fonctionnalite
+backend/   FastAPI + yfinance/justETF -> une route par fonctionnalite, donnees formatees en JSON
+frontend/  React + Vite -> deux onglets : recherche unitaire / analyse par lot
 ```
 
-Le frontend n'appelle jamais yfinance directement : chaque carte de l'UI
-correspond a exactement une route backend.
+Le frontend n'appelle jamais yfinance ni justETF directement : chaque carte de
+l'UI correspond a exactement une route backend.
 
-| Fonctionnalite demandee        | Route backend                                  | Source yfinance |
-|---------------------------------|-------------------------------------------------|-----------------|
-| ISIN -> symbole Yahoo           | `GET /api/securities/resolve?isin=...`           | `yf.Search(isin)` (Yahoo detecte automatiquement le format ISIN) |
-| Secteur d'activite              | `GET /api/securities/{symbol}/profile`           | `Ticker.info["sector"/"industry"]` (actions) ou `Ticker.funds_data.sector_weightings` (ETF/fonds) |
-| Secteur/zone geographique       | `GET /api/securities/{symbol}/profile`           | `Ticker.info["country"]`, converti en zone (Europe, Amerique du Nord...) via une table de correspondance interne |
-| Valeur courante                 | `GET /api/securities/{symbol}/price`             | `Ticker.fast_info` (last_price, previous_close, currency) |
-| Historique (courbe)             | `GET /api/securities/{symbol}/history`           | `Ticker.history(period=, interval=)` |
-| Frais de gestion (optionnel)    | `GET /api/securities/{symbol}/fees`              | `Ticker.funds_data.fund_operations` ("Annual Report Expense Ratio"), uniquement pour ETF/fonds |
-| Repartition geographique par pays (ETF/fonds) | `GET /api/geography/countries?isin=...` | Scraping de justETF.com (hors yfinance, voir ci-dessous) |
+### Onglet "Recherche unitaire"
+
+| Fonctionnalite                  | Route backend                                    | Source |
+|----------------------------------|---------------------------------------------------|--------|
+| ISIN -> symbole Yahoo            | `GET /api/securities/resolve?isin=...`             | `yf.Search(isin)` |
+| Nom/texte -> candidats            | `GET /api/securities/search?query=...`             | `yf.Search(texte)`, plusieurs resultats a choisir |
+| Symbole -> ISIN (best-effort)     | `GET /api/securities/{symbol}/isin`                | `Ticker.isin` (yfinance, experimental, echoue souvent) |
+| Secteur d'activite               | `GET /api/securities/{symbol}/sector`              | `Ticker.info["sector"/"industry"]` (actions) ou `Ticker.funds_data.sector_weightings` (ETF/fonds) |
+| Zone geographique                | `GET /api/geography/countries?isin=...`            | justETF (voir ci-dessous), ETF/fonds uniquement |
+| Top 10 positions                 | `GET /api/securities/{symbol}/top-holdings`        | `Ticker.funds_data.top_holdings`, ETF/fonds uniquement |
+| Valeur courante                  | `GET /api/securities/{symbol}/price`               | `Ticker.fast_info` |
+| Historique (courbe)              | `GET /api/securities/{symbol}/history`             | `Ticker.history(period=, interval=)` |
+| Frais de gestion (optionnel)     | `GET /api/securities/{symbol}/fees`                | `Ticker.funds_data.fund_operations`, ETF/fonds uniquement |
 
 Chaque route degrade proprement (renvoie `note` explicative) quand la source
 ne fournit pas la donnee (ex : pas de secteur pour un fonds, pas de frais pour
-une action).
+une action). Quand la recherche par nom ne retrouve pas l'ISIN automatiquement,
+un champ permet de le completer a la main (necessaire pour la carte geographie).
+
+### Onglet "Recherche par lot"
+
+`POST /api/portfolio/analyze` prend un CSV (voir modele telechargeable dans
+l'UI) avec 3 colonnes : `isin`, `quantity` (quantite), `unit_value` (valeur de
+part). Delimiteur `,` ou `;` et separateur decimal `,` ou `.` auto-detectes.
+
+Pour chaque ligne : `position_value = quantity * unit_value`, l'ISIN est
+resolu (meme route que la recherche unitaire), puis le secteur/geographie/top
+holdings de chaque ligne sont agreges, ponderes par `position_value / total` :
+
+- **Secteur** : somme ponderee de `sector` (action, 100% d'un secteur) ou
+  `sector_weightings` (fonds) sur toutes les lignes.
+- **Geographie** : idem via justETF, uniquement sur les lignes ETF/fonds (le
+  `geography_coverage` renvoye indique quelle part du portefeuille est
+  couverte, les actions en direct n'y figurant pas).
+- **Top holdings (look-through)** : une action detenue en direct compte pour
+  100% de son propre poids ; pour un fonds, ses positions (top 10 connu de
+  Yahoo) sont ponderees par le poids du fonds dans le portefeuille, puis
+  fusionnees par symbole. `holdings_coverage` indique la part couverte ; un
+  fonds tres diversifie peut etre sous-represente puisque seul son propre
+  top 10 est connu (pas la composition complete).
+
+Les lignes non resolues (ISIN invalide, non trouve, nombre illisible) sont
+listees avec leur numero de ligne et la raison, sans faire echouer le reste
+de l'analyse.
 
 ### Repartition geographique (justETF)
 
@@ -107,9 +139,16 @@ Vite proxifie automatiquement `/api/*` vers `http://127.0.0.1:8000`.
 
 ## Limites connues
 
-- La "zone geographique" est deduite du pays du siege social (`info.country`)
-  via une table de correspondance simple ; ce n'est pas une repartition des
-  revenus par zone (donnee non exposee par yfinance pour les actions).
-- Les frais de gestion (`fund_operations`) ne sont pas toujours fournis par
-  Yahoo Finance pour tous les ETF (limitation cote donnees, pas cote code) ;
-  la route renvoie alors une note explicative plutot qu'une erreur.
+- La zone geographique (justETF) ne couvre que les ETF/fonds, jamais les
+  actions individuelles (source specialisee ETF, pas de donnee equivalente
+  pour les actions dans l'app).
+- Les frais de gestion (`fund_operations`) et le top holdings ne sont pas
+  toujours fournis par Yahoo Finance pour tous les ETF (limitation cote
+  donnees, pas cote code) ; la route renvoie alors une note explicative
+  plutot qu'une erreur.
+- La resolution ISIN a partir d'un symbole trouve par recherche texte
+  (`Ticker.isin`) est experimentale cote yfinance et echoue pour une partie
+  des titres ; completer l'ISIN a la main reste la solution fiable.
+- Dans l'analyse par lot, le "top holdings" agrege n'est qu'un look-through
+  partiel : seul le top 10 de chaque fonds est connu (pas sa composition
+  complete), donc un fonds tres diversifie peut y etre sous-represente.
