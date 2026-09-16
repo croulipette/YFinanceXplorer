@@ -23,9 +23,8 @@ function App() {
         {resolved && (
           <div key={resolved.symbol} className="app-main">
             <ProfileSection symbol={resolved.symbol} />
-            {(resolved.quote_type === 'ETF' || resolved.quote_type === 'MUTUALFUND') && (
-              <GeographySection isin={resolved.isin} />
-            )}
+            {(resolved.quote_type === 'ETF' || resolved.quote_type === 'MUTUALFUND') &&
+              resolved.isin && <GeographySection isin={resolved.isin} />}
             <PriceSection symbol={resolved.symbol} />
             <HistorySection symbol={resolved.symbol} />
             <FeesSection symbol={resolved.symbol} />

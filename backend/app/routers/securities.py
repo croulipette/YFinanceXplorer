@@ -38,6 +38,28 @@ def resolve(
 
 
 @router.get(
+    "/search",
+    response_model=schemas.SearchResponse,
+    summary="Recherche libre par nom/symbole (ex: 'Msci World')",
+)
+def search(
+    query: str = Query(..., min_length=2, description="Nom ou symbole a rechercher, ex: 'Msci World'"),
+    max_results: int = Query(8, ge=1, le=20),
+):
+    results = yf_service.search_symbols(query, max_results=max_results)
+    return {"query": query, "results": results}
+
+
+@router.get(
+    "/{symbol}/isin",
+    response_model=schemas.IsinLookupResponse,
+    summary="ISIN d'un symbole deja connu (best-effort, pour la carte geographie)",
+)
+def isin_for_symbol(symbol: str):
+    return {"symbol": symbol, "isin": yf_service.get_isin_for_symbol(symbol)}
+
+
+@router.get(
     "/{symbol}/profile",
     response_model=schemas.ProfileResponse,
     summary="Secteur d'activite et zone geographique",

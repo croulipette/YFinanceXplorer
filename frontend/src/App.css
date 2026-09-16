@@ -114,6 +114,52 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+.search-results {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-result-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.search-result-item:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.search-result-symbol {
+  font-weight: 600;
+}
+
+.search-result-name {
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-result-meta {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
 .resolve-form input {
   flex: 1;
   min-width: 200px;

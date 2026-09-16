@@ -61,6 +61,44 @@ def resolve_isin(isin: str) -> Optional[dict]:
     }
 
 
+def search_symbols(query: str, max_results: int = 8) -> list:
+    """Recherche libre par nom/symbole (ex: 'Msci World') via l'endpoint de
+    recherche Yahoo. A la difference de resolve_isin, renvoie plusieurs
+    candidats a choisir cote front (une recherche par nom est ambigue :
+    plusieurs emetteurs proposent un ETF 'MSCI World')."""
+    query = query.strip()
+    search = yf.Search(query, max_results=max_results, raise_errors=False)
+    quotes = search.quotes or []
+
+    results = []
+    for quote in quotes:
+        symbol = quote.get("symbol")
+        if not symbol:
+            continue
+        results.append(
+            {
+                "symbol": symbol,
+                "shortname": quote.get("shortname") or quote.get("longname"),
+                "exchange": quote.get("exchDisp") or quote.get("exchange"),
+                "quote_type": quote.get("quoteType") or quote.get("typeDisp"),
+            }
+        )
+    return results
+
+
+def get_isin_for_symbol(symbol: str) -> Optional[str]:
+    """Cherche l'ISIN d'un symbole deja connu (recherche par nom -> pas
+    d'ISIN dans les resultats). Best-effort : yfinance scrape la page de
+    cotation Yahoo, renvoie None si absent ou introuvable."""
+    try:
+        isin = yf.Ticker(symbol).isin
+    except Exception:
+        return None
+    if not isin or isin == "-":
+        return None
+    return isin
+
+
 def get_profile(symbol: str) -> dict:
     ticker = yf.Ticker(symbol)
     info = ticker.info or {}

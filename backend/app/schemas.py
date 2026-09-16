@@ -11,6 +11,23 @@ class ResolveResponse(BaseModel):
     quote_type: Optional[str] = None
 
 
+class SearchResultItem(BaseModel):
+    symbol: str
+    shortname: Optional[str] = None
+    exchange: Optional[str] = None
+    quote_type: Optional[str] = None
+
+
+class SearchResponse(BaseModel):
+    query: str
+    results: List[SearchResultItem]
+
+
+class IsinLookupResponse(BaseModel):
+    symbol: str
+    isin: Optional[str] = None
+
+
 class ProfileResponse(BaseModel):
     symbol: str
     quote_type: Optional[str] = None

@@ -22,6 +22,14 @@ export function resolveIsin(isin) {
   return request(`${BASE_URL}/resolve?isin=${encodeURIComponent(isin)}`)
 }
 
+export function searchSymbols(query) {
+  return request(`${BASE_URL}/search?query=${encodeURIComponent(query)}`)
+}
+
+export function getIsinForSymbol(symbol) {
+  return request(`${BASE_URL}/${encodeURIComponent(symbol)}/isin`)
+}
+
 export function getProfile(symbol) {
   return request(`${BASE_URL}/${encodeURIComponent(symbol)}/profile`)
 }
