@@ -3,3 +3,4 @@ uvicorn[standard]>=0.30
 yfinance>=1.7.0
 beautifulsoup4>=4.11
 curl_cffi>=0.15
+python-multipart>=0.0.9

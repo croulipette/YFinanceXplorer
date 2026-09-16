@@ -1,15 +1,10 @@
 import { useState } from 'react'
 import './App.css'
-import ResolveSection from './components/ResolveSection'
-import SectorSection from './components/SectorSection'
-import GeographySection from './components/GeographySection'
-import TopHoldingsSection from './components/TopHoldingsSection'
-import PriceSection from './components/PriceSection'
-import HistorySection from './components/HistorySection'
-import FeesSection from './components/FeesSection'
+import SingleSearchTab from './components/SingleSearchTab'
+import BatchSearchTab from './components/BatchSearchTab'
 
 function App() {
-  const [resolved, setResolved] = useState(null)
+  const [tab, setTab] = useState('single') // single | batch
 
   return (
     <div className="app">
@@ -18,20 +13,24 @@ function App() {
         <p>Renseigne un code ISIN, puis teste chaque route independamment.</p>
       </header>
 
-      <main className="app-main">
-        <ResolveSection onResolved={setResolved} />
+      <nav className="tabs">
+        <button
+          type="button"
+          className={`tab-button${tab === 'single' ? ' active' : ''}`}
+          onClick={() => setTab('single')}
+        >
+          Recherche unitaire
+        </button>
+        <button
+          type="button"
+          className={`tab-button${tab === 'batch' ? ' active' : ''}`}
+          onClick={() => setTab('batch')}
+        >
+          Recherche par lot
+        </button>
+      </nav>
 
-        {resolved && (
-          <div key={resolved.symbol} className="app-main">
-            <SectorSection symbol={resolved.symbol} />
-            {resolved.isin && <GeographySection isin={resolved.isin} />}
-            <TopHoldingsSection symbol={resolved.symbol} />
-            <PriceSection symbol={resolved.symbol} />
-            <HistorySection symbol={resolved.symbol} />
-            <FeesSection symbol={resolved.symbol} />
-          </div>
-        )}
-      </main>
+      <main>{tab === 'single' ? <SingleSearchTab /> : <BatchSearchTab />}</main>
     </div>
   )
 }

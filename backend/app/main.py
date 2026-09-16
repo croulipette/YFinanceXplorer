@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import geography, securities
+from .routers import geography, portfolio, securities
 
 app = FastAPI(
     title="YFinance Explorer API",
@@ -21,6 +21,7 @@ app.add_middleware(
 
 app.include_router(securities.router)
 app.include_router(geography.router)
+app.include_router(portfolio.router)
 
 
 @app.get("/api/health", tags=["health"])

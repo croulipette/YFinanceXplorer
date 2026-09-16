@@ -55,3 +55,16 @@ export function getFees(symbol) {
 export function getCountryBreakdown(isin) {
   return request(`/api/geography/countries?isin=${encodeURIComponent(isin)}`)
 }
+
+export async function analyzePortfolio(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const res = await fetch('/api/portfolio/analyze', { method: 'POST', body: formData })
+  const data = await res.json().catch(() => null)
+  if (!res.ok) {
+    const message = formatDetail(data?.detail) || `Erreur HTTP ${res.status}`
+    throw new Error(message)
+  }
+  return data
+}

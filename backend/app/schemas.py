@@ -89,6 +89,43 @@ class TopHoldingsResponse(BaseModel):
     note: Optional[str] = None
 
 
+class PortfolioLine(BaseModel):
+    row: int
+    isin: str
+    symbol: Optional[str] = None
+    name: Optional[str] = None
+    quote_type: Optional[str] = None
+    quantity: float
+    unit_value: float
+    position_value: float
+    weight: Optional[float] = None
+
+
+class PortfolioError(BaseModel):
+    row: int
+    isin: Optional[str] = None
+    reason: str
+
+
+class PortfolioHolding(BaseModel):
+    symbol: str
+    name: Optional[str] = None
+    weight: float
+
+
+class PortfolioAnalysisResponse(BaseModel):
+    total_lines: int
+    resolved_lines: int
+    total_value: float
+    lines: List[PortfolioLine]
+    errors: List[PortfolioError]
+    sector_breakdown: Dict[str, float]
+    geography_breakdown: Optional[Dict[str, float]] = None
+    geography_coverage: float
+    top_holdings: List[PortfolioHolding]
+    holdings_coverage: float
+
+
 class FeesResponse(BaseModel):
     symbol: str
     quote_type: Optional[str] = None
